@@ -45,6 +45,8 @@ size_t      sysinfo_total_swap(CSystem system);
 size_t      sysinfo_free_swap(CSystem system);
 size_t      sysinfo_used_swap(CSystem system);
 
+size_t      sysinfo_min_of_free_memory_or_cgroup_free_memory(CSystem system);
+
 void        sysinfo_cpus_usage(CSystem system, unsigned int *length, float **cpus);
 
 size_t      sysinfo_processes(CSystem system, bool (*fn_pointer)(PID, CProcess, void*),

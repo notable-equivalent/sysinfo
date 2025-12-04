@@ -218,6 +218,24 @@ pub extern "C" fn sysinfo_used_swap(system: CSystem) -> size_t {
     }
 }
 
+/// Returns the minimum of [`System::free_memory()`][crate::System#method.free_memory] and
+/// [`System::cgroup_limits().free_memory()`][crate::System#method.cgroup_limits] if available.
+#[unsafe(no_mangle)]
+pub extern "C" fn sysinfo_min_of_free_memory_or_cgroup_free_memory(system: CSystem) -> size_t {
+    assert!(!system.is_null());
+    unsafe {
+        let system: Box<System> = Box::from_raw(system as *mut System);
+        let base_free_memory = system.free_memory() as size_t;
+        let ret = if let Some(cgroup_limits) = system.cgroup_limits() {
+            std::cmp::min(base_free_memory, cgroup_limits.free_memory as size_t)
+        } else {
+            base_free_memory
+        };
+        let _ = Box::into_raw(system);
+        ret
+    }
+}
+
 /// Equivalent of [`Networks::new()`][crate::Networks#method.new].
 #[unsafe(no_mangle)]
 pub extern "C" fn sysinfo_networks_init() -> CNetworks {
